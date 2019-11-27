@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>Data.SysApi.In</artifactId>
+        <groupId>sonli</groupId>
+        <version>4.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>Data.SysApi.In-Web</artifactId>
+
+    <!--#### springboot-begin ####-->
+    <packaging>jar</packaging>
+    <properties>
+        <!-- 需要在Repository Service Web 三大模块中加上此属性,作用是不向maven私服中发布这三个模块中的包 -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+    <!--#### springboot-end ####-->
+
+    <dependencies>
+        <dependency>
+            <groupId>sonli</groupId>
+            <artifactId>Data.SysApi.In-Service</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+        <!--#### springboot-begin ####-->
+        <dependency>
+            <groupId>WitParking</groupId>
+            <artifactId>Core-SpringBoot</artifactId>
+            <version>4.0.0.bjtz_gov</version>
+            <!-- 注:如果创建不需要数据库支持的服务 需要排除部分依赖>-->
+            <exclusions>
+                <exclusion>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-jdbc</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-context</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${springboot.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <!--#### springboot-end ####-->
+        <!--<dependency>-->
+            <!--<groupId>WitParking</groupId>-->
+            <!--<artifactId>Core-SpringRemote</artifactId>-->
+            <!--<version>4.0.0</version>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>com.sonli.witparking</groupId>
+            <artifactId>Configurations.Interfaces</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+    </dependencies>
+
+
+    <!--#### springboot-begin ####-->
+    <build>
+        <finalName>${project.parent.artifactId}_${project.parent.version}_${server.port}_D${dubbo.port}_${timestamp}_${spring.profiles.include}</finalName>
+        <plugins>
+            <!--可以把依赖的包都打包到生成的Jar包中-->
+            <!--
+            clean package -Dmaven.test.skip=true
+              -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>1.4.1.RELEASE</version>
+                <configuration><!-- 指定该Main Class为全局的唯一入口 -->
+                    <mainClass>${witparking.startClass}</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- 打包时,输出文件加上日期后缀 -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.4</version>
+                <configuration>
+                    <timestampFormat>yyyyMMdd_HHmm</timestampFormat>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>create-timestamp</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <inherited>false</inherited>
+            </plugin>
+            <!-- 保证application.properties中的变量能够在maven中读取,用${xx}占位替换 -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>src/main/resources/application.properties</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <!--#### springboot-end ####-->
+
+</project>
